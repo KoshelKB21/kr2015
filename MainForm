@@ -1,9 +1,319 @@
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 
-public class MainForm {
+class MainForm extends Canvas {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+    private static final int BLACK = 0;
+	//private static final int RED = 1;
+	//private static final int GREEN = 0;
+	int bigMas = 30;
+    int smallMas = 15;
+    int pos_in_A;
+    int pos_in_B;
+    int pos_in_C;
+    int pos_in_C_to_0; 
+    int unSortMas[];
+    int sortMas[];
+    int additionalMas[];
+    int visStep;
+    int mas_A_step;
+    int mas_B_step;
+    int mas_C_step;
+    int state = 0;
+    int work;
+    int work1;
+    int work2;
+    String firstCom = "";
+    String secondCom = "";
+    String thirdCom = "";
 
-	}
+    public void initialization(){
+    unSortMas = new int [bigMas];
+    sortMas = new int [bigMas];
+      additionalMas = new int [smallMas];
+
+      for(work=0; work < bigMas; work++)
+    	 unSortMas[work] = (int)((smallMas-1) * Math.random())+1;
+
+      for(int work1 = 0; work1 < bigMas; work1++)
+    	  sortMas[work1] = -1;
+      
+      for(int work2 = 0; work2 < smallMas; work2++)
+    	  additionalMas[work2] = 0;
+
+      visStep = 0;
+
+
+      mas_A_step = -1;
+      mas_B_step = -1;
+      mas_C_step = -1;
+
+      firstCom = "Ìîæíî íà÷èíàòü âèçóàëèçàöèþ";
+      secondCom = "";
+      thirdCom = "";
+    }
+
+    public void restart(){
+      state = 0;
+      this.initialization();
+      this.repaint();
+    }
+
+
+    public void paint(Graphics g) {
+      int xi;
+      int rectHeight=20;
+      int rectWidth=20;
+      int initialX;
+      int initialY;
+      String str = "";
+
+
+      Color activeColor = new Color(250,140,140);
+      Color activeColor2 = new Color(120,255,120);
+      Color mainColor = new Color(BLACK);
+      g.setColor(mainColor);
+      Font font = new Font("Calibri", Font.PLAIN, 14);
+      g.setFont(font);
+
+      // Íåîòñîðòèðîâàííûé ìàññèâ (À)
+      initialX = 80;  initialY = 40;
+      for(xi = 0; xi < bigMas; xi++)
+      {
+        if (xi == mas_A_step)
+        {
+          g.setColor(activeColor);
+          g.fillRect(initialX, initialY, rectWidth, rectHeight);
+          g.setColor(mainColor);
+        }
+
+        g.drawRect(initialX, initialY, rectWidth, rectHeight);
+        str = Integer.toString(unSortMas[xi]);
+        g.drawString(str, initialX + rectWidth/2 - str.length()*font.getSize()/4,
+        		initialY + rectHeight/2 + font.getSize()/2 - 1);
+        initialX += rectWidth;
+      }
+
+      g.drawString("À:", 10, initialY + rectHeight/2 + font.getSize()/2 - 1);
+
+     
+
+      //Îòñîðòèðîâàííûé ìàññèâ ( Â)
+      initialX = 80; initialY = 160;
+      for(xi = 0; xi <bigMas; xi++)
+      {
+        if (xi == mas_B_step)
+        {
+          g.setColor(activeColor);
+          g.fillRect(initialX, initialY, rectWidth, rectHeight);
+          g.setColor(mainColor);
+        }
+
+        g.drawRect(initialX, initialY, rectWidth, rectHeight);
+        if (sortMas[xi] > 0)
+        {
+          str = Integer.toString(sortMas[xi]);
+          g.drawString(str, initialX + rectWidth/2 - str.length()*font.getSize()/4,
+        		  initialY + rectHeight/2 + font.getSize()/2 - 1);
+        }
+
+        initialX += rectWidth;
+      }
+      g.drawString("B:", 10, initialY + rectHeight/2 + font.getSize()/2 - 1);
+
+      // Äîïîëíèòåëüíûé ìàññèâ(Ñ)
+      initialX = 80; initialY = 100;
+      for(xi = 0; xi < smallMas; xi++)
+      {
+
+          if (xi == mas_C_step)
+          {
+            g.setColor(activeColor2);
+            g.fillRect(initialX, initialY, rectWidth, rectHeight);
+            g.setColor(mainColor);
+          }
+        if (visStep == 1)
+          if (xi == (mas_C_step-1))
+          {
+            g.setColor(activeColor);
+            g.fillRect(initialX, initialY, rectWidth, rectHeight);
+            g.setColor(mainColor);
+          }
+
+
+        g.drawRect(initialX, initialY, rectWidth, rectHeight);
+        if (state > 0)
+        {
+          str = Integer.toString(additionalMas[xi]);
+          g.drawString(str, initialX + rectWidth/2 - str.length()*font.getSize()/4,
+        		  initialY + rectHeight/2 + font.getSize()/2 - 1);
+        }
+        initialX += rectWidth;
+      }
+      g.drawString("C:", 10, initialY + rectHeight/2 + font.getSize()/2 - 1);
+      //
+      Font fontLittle = new Font("Calibri", Font.PLAIN, 9);
+      g.setFont(fontLittle);
+
+      String sNum = "";
+      initialX = 80; initialY = 40;
+      for(xi = 0; xi <bigMas; xi++){
+        sNum = str.valueOf(xi + 1);
+        g.drawString(sNum, initialX - 1 + rectWidth*xi + rectWidth/2, initialY-3);
+      }
+      initialX = 80; initialY = 100;
+      for(xi = 0; xi < smallMas; xi++){
+        sNum = str.valueOf(xi + 1);
+        g.drawString(sNum, initialX - 2 + rectWidth*xi + rectWidth/2, initialY-3);
+      }
+      initialX = 80; initialY = 160;
+      for(xi = 0; xi < bigMas; xi++){
+        sNum = str.valueOf(xi + 1);
+        g.drawString(sNum, initialX - 3 + rectWidth*xi + rectWidth/2, initialY-3);
+      }
+      g.setFont(font);
+
+
+      g.drawString(firstCom, 60, 220);
+      g.drawString(secondCom, 60, 260);
+      g.drawString(thirdCom, 60, 280);
+    }
+   
+    public void MakeStep() {
+
+    // Switch for the programm
+    switch (state)
+    {
+      case 0:
+        state = 1; pos_in_C_to_0 = 0;
+ 
+        break;
+      case 1:
+       for (pos_in_C_to_0 = 0; pos_in_C_to_0 < smallMas; pos_in_C_to_0++)
+    	   additionalMas[pos_in_C_to_0] = 0;
+       firstCom = "Çàïîëíèòü íóëÿìè ìàññèâ C.";
+       state = 2; pos_in_A = 0;
+       break;
+
+      case 2:
+        if (pos_in_A <bigMas)
+        {
+        	additionalMas[unSortMas[pos_in_A]-1] = additionalMas[unSortMas[pos_in_A]-1] + 1;
+        	pos_in_A++;
+
+        }
+        else
+        {
+          state = 3;
+          pos_in_C = 1;
+        }
+
+        break;
+
+      case 3:
+        if (pos_in_C < smallMas)	{additionalMas[pos_in_C] = additionalMas[pos_in_C] + additionalMas[pos_in_C-1];	pos_in_C++; }
+        else		{state = 4;	pos_in_B = bigMas - 1; }
+        break;
+
+      case 4:
+        if (pos_in_B  >= 0)	{sortMas[additionalMas[unSortMas[pos_in_B]-1]-1] = unSortMas[pos_in_B];  additionalMas[unSortMas[pos_in_B]-1] = additionalMas[unSortMas[pos_in_B]-1] - 1;  pos_in_B--; }
+        else		{state = 5;}
+        break;
+
+      case 5:
+        break;
+      }
+
+
+    // Switch for the visualisation:
+    switch (state)
+    {
+      case 0:
+        break;
+      case 1:
+    	  firstCom = "Äëÿ íà÷àëà çàïîëíèì íóëÿìè ìàññèâ C (Âåäü åùå íå ïîñ÷èòàëè êîë-âî êàæäîé öèôðû).";
+       break;
+
+       case 2:
+        if (pos_in_A < bigMas)
+       {
+        	mas_A_step = pos_in_A;
+        	mas_C_step = unSortMas[pos_in_A]-1;
+          mas_B_step = -1;
+          String ss1 = Integer.toString(pos_in_A+1);
+          String ss2 = Integer.toString(mas_C_step+1);
+
+          firstCom = "Â ìàññèâå C óâåëè÷èòü íà åäèíèöó A[" + ss1+ "]-é ýëåìåíò. (" + ss2 + "-é ýëåìåíò).";
+        }
+
+        break;
+
+      case 3:
+    	  visStep = 1;
+
+        if (pos_in_C < smallMas)
+        {
+        	mas_A_step = -1;
+        	mas_C_step = pos_in_C;
+          mas_B_step = -1;
+          firstCom = "Â " + Integer.toString(mas_C_step+1) +
+        		  "-é ýëåìåíò ìàññèâà Ñ çàïèñàòü ñóììó " + 
+        		  Integer.toString(mas_C_step) + 
+        		  "-ãî è " +
+        		  Integer.toString(mas_C_step+1) + 
+        		  "-ãî ýëåìåíòîâ.";
+        }
+        else
+        	firstCom = "Ìàññèâ Ñ äëÿ ðàáîòû ñ ìàññèâîì Â ãîòîâ.";
+
+        break;
+
+      case 4:
+    	  visStep = 2;
+
+        if (pos_in_B >= 0)
+        {
+        	mas_A_step = pos_in_B;
+        	mas_C_step = unSortMas[pos_in_B]-1;
+          mas_B_step = additionalMas[unSortMas[pos_in_B]-1]-1;
+
+          String ss1 = "Çíà÷åíèå "+
+                  Integer.toString(mas_A_step+1) +
+        		  "-ãî ýëåìåíòà A ðàâíî " +
+        		  Integer.toString(unSortMas[pos_in_B]) +
+        		  ".  ";
+          String ss2 = "Íàéòè çíà÷åíèå " +
+        		  Integer.toString(unSortMas[pos_in_B]) + 
+        		  "-ãî ýëåìåíòà C.";
+          firstCom = ss1 + ss2;
+          secondCom = "Èñêîìîå çíà÷åíèå ðàâíî " +
+                 Integer.toString(mas_B_step+1) +
+                 ".";
+          thirdCom = "Çàïèñàòü " +
+                 Integer.toString(mas_A_step+1) +
+                 "-é ýëåìåíò À íà " + Integer.toString(mas_B_step+1) + 
+                 " ïîçèöèþ â âûõîäíîé ìàññèâ B.";
+        }
+        else
+        {
+        	firstCom = "Ìàññèâ îòñîðòèðîâàí. Âèçóàëèçàöèÿ çàâåðøåíà.";
+        	secondCom = "";
+        	thirdCom = "";
+        }
+
+        break;
+       case 5:
+         break;
+
+      }
+
+
+    repaint();
+
+
+    } 
 
 }
+
